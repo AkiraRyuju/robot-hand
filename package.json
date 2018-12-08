@@ -1,0 +1,21 @@
+{
+  "name": "robot-hand",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "start-old": "node server/body.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AkiraRyuju/robot-hand.git"
+  },
+  "author": "Akira Ryuju Ichimura",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AkiraRyuju/robot-hand/issues"
+  },
+  "homepage": "https://github.com/AkiraRyuju/robot-hand#readme"
+}

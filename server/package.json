@@ -1,0 +1,27 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "body.js",
+  "dependencies": {
+    "browser-serialport": "^2.1.0",
+    "chalk": "^2.4.1",
+    "color-convert": "^1.9.2",
+    "debug": "^3.1.0",
+    "ease-component": "^1.0.0",
+    "johnny-five": "^0.15.0",
+    "lodash.clonedeep": "^4.5.0",
+    "lodash.debounce": "^4.0.8",
+    "nanotimer": "^0.3.15",
+    "node-http-server": "^8.1.2",
+    "serialport": "^6.2.2",
+    "socketio": "^1.0.0",
+    "temporal": "^0.7.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
