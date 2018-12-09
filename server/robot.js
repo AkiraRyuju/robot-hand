@@ -6,15 +6,19 @@ class robot {
     //const board = new five.Board(); // TODO: Specify COM port from options
     const board = new five.Board();
 
-    // COnstructs the first finger
+    this.isReady = false;
+
+    // Constructs the first finger
     this.finger1 = new digit({
       minAngle: options.finger1.minAngle,
       maxAngle: options.finger1.maxAngle,
-      pin: options.finger1.pin
+      pin: options.finger1.pin,
+      startAt: options.finger1.startAt
     });
     //Arrow function does magic to 'this' 
     //// Lexical this - The this will not refer to board but will instead refer to constructor/ robot
     board.on("ready", () => {
+      this.isReady = true;
       this.finger1.bind();
       callback();
     });
@@ -34,66 +38,96 @@ class digit {
     this.minAngle = options.minAngle;
     this.maxAngle = options.maxAngle;
     this.pin = options.pin;
+    this.currentPosition = options.startAt;
 
   }
+
   //Connects servo to an instance of the finger
   //Will only run once the board is ready - The methods need the board to be ready first to run
   bind() {
     this.servo = new five.Servo({
       pin: this.pin,
-      deviceRange: [0, 180]
+      deviceRange: [0, 180],
+      startAt: this.currentPosition
     });
   }
+
   //Method to do the sweep function
-  sweep() {
+  getPos(callback) {
     //Will try to execute the code within the try but will do the Catch err part if any error is thrown
-    try {
-      this.servo.sweep();
-      this.log(`Sweeping...`);
-    } catch (err) {
-      this.error(err);
-    }
+    console.log(this.currentPosition);
+
+    callback({
+      "message": "success",
+      "angle": this.currentPosition
+    });
   }
-  close() {
+
+  close(callback) {
     // TODO: add speed argument
     try {
+      callback(this.log(`Closing to angle ${this.minAngle}`)); //New way to combine String and Variables in a log
       this.servo.to(this.minAngle);
-      this.log(`Going to angle ${this.minAngle}`); //New way to combine String and Variables in a log
+      this.currentPosition = this.minAngle;
     } catch (err) {
-      this.error(err);
+      callback(this.error(err));
     }
   }
-  open() {
+
+  open(callback) {
     // TODO: add speed argument
     try {
-      this.log(`Going to angle ${this.maxAngle}`);
+      callback(this.log(`Opening to angle ${this.maxAngle}`));
       this.servo.to(this.maxAngle);
+      this.currentPosition = this.maxAngle;
     } catch (err) {
-      this.error(err);
+      callback(this.error(err));
     }
   }
-  goto(angle, err) {
-    if (angle < this.minAngle || angle > this.maxAngle) { //Makes sure that the requested Angle is within bounds
-      err('Angle out of bounds!');
+
+  goto(angle, callback) {
+    angle = parseInt(angle);
+
+    if (isNaN(angle)) {
+
+      callback(this.error({ message: `'angle' is not a number!` }));
+
     } else {
-      try {
-        this.log(`Going to angle ${angle}`);
-        this.servo.to(angle);
-      } catch (err) {
-        this.error(err);
+
+      if (angle < this.minAngle || angle > this.maxAngle) { //Makes sure that the requested Angle is within bounds
+
+        callback(this.error({ message: `Angle ${angle} out of range ${this.minAngle}-${this.maxAngle}` }));
+
+      } else {
+
+        try {
+          callback(this.log(`Going to angle ${angle}`));
+          this.servo.to(angle);
+          this.currentPosition = angle;
+        } catch (err) {
+          callback(this.error(err));
+        }
+
       }
+
     }
+
   }
+
   log(message) {
     console.log(message);
+    return { message: message };
     // TODO: return console message to webserver
   }
+
   error(err) {
-    this.log(`Digit error. (${err.message})`); //Only throws back a readable, necessary part of the error message
+    return this.log(`Digit error. (${err.message})`); //Only throws back a readable, necessary part of the error message
   }
+
   getInfo() {
     // TODO: return this class' information
   }
+
   calibrate(minOffset, maxOffset) {
     // TODO: Add these to a data store
   }

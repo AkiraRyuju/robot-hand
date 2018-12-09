@@ -1,4 +1,4 @@
-//The body of the code - brings everything together
+//The main program - brings everything together
 
 //Imports classes
 var webserver = require('./webserver');
@@ -11,7 +11,8 @@ var robot1 = new robot({
   finger1: {
     minAngle: 0,
     maxAngle: 174,
-    pin: 10
+    pin: 10,
+    startAt: 0
   }
   //finger2:{}
   //finger3:{}
@@ -28,31 +29,59 @@ var robot1 = new robot({
 var ws1 = new webserver({
   port: 4444,
   documentRoot: './www',
-  routes: routes
+  api: {
+    rule: "/api",
+    routeHandler: routeHandler
+  }
 });
 
 // ROUTES & BUSINESS LOGIC
 // Handles requests from client
-function routes(request, response, serve) {
-  var path = request.uri.path;
+function routeHandler(request, response) {
+  var path = request.url;
+
+  if (!robot1.isReady) {
+    return false;
+  }
+
+
+  function jsonResponse(messageObject) {
+    response.writeHead(200, { 'Content-Type': 'application/json' });
+    response.write(JSON.stringify(messageObject));
+    response.end();
+  }
 
   switch (path) {
 
+    /*case '/api/blink-test': // TODO: After I've created a 'led' class in robot.js
+      robot1.led.blink(function (messageObject) {
+        jsonResponse(messageObject);
+      });
+      break;*/
+
     case '/api/open':
-      robot1.finger1.open();
+      robot1.finger1.open(function (messageObject) {
+        jsonResponse(messageObject);
+      });
       break;
 
     case '/api/close':
-      robot1.finger1.close();
+      robot1.finger1.close(function (messageObject) {
+        jsonResponse(messageObject);
+      });
       break;
 
-    case '/api/sweep':
-      robot1.finger1.sweep();
+    case '/api/get-pos':
+      robot1.finger1.getPos(function (messageObject) {
+        jsonResponse(messageObject);
+      });
       break;
   }
 
   if (path.indexOf("/api/goto?angle=") > -1) { // If "?angle=" exists in the string 'path' then...
     var angle = path.substr(16); //takes the characters from the string starting from the 16th characters until the end of the string
-    robot1.finger1.goto(angle); // This needs to be able to handle things if it isnt an integer
+    robot1.finger1.goto(angle, function (messageObject) {
+      jsonResponse(messageObject);
+    });
   }
 }

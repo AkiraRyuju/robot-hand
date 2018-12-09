@@ -1,48 +1,76 @@
 <html>
 
 <head>
+
+	<style>
+		div#buttons > div {
+			display: inline-block;
+		}
+			div#buttons > div a {
+				background-color: lightgray;
+				padding:20px;
+			}
+	</style>
+
 	<script>
 		function ajaxRequest(request_url) {
 			var xhttp = new XMLHttpRequest();
-			/*
-			xhttp.onreadystatechange = function() {
+			xhttp.onreadystatechange = function () {
 				if (this.readyState == 4 && this.status == 200) {
-					document.getElementById("demo").innerHTML =	this.responseText;
+					var messageObject = JSON.parse(this.response);
+					updateStatus(messageObject.message);
 				}
 			};
-			*/
 			xhttp.open("GET", request_url, true);
 			xhttp.send();
 		}
 
-
-		function blinkTest() {
-			ajaxRequest('/api/blink-test');
+		function updateStatus(message) {
+			document.getElementById('status').innerHTML = message;
 		}
 
-		function fingerOpen() {
-			ajaxRequest('/api/open');
-		}
-		function fingerClose() {
-			ajaxRequest('/api/close');
-		}
 		function fingerGoto() {
-			ajaxRequest('/api/goto?angle=10');
+			var angle = document.getElementById('gotoAngle').value;
+			ajaxRequest('/api/goto?angle=' + angle);
+		}
+
+		function sendInstruction(action) {
+			switch (action) {
+				case 'blink-test':
+					ajaxRequest('/api/blink-test');
+					break;
+				case 'finger-open':
+					ajaxRequest('/api/open');
+					break;
+				case 'finger-close':
+					ajaxRequest('/api/close');
+					break;
+				case 'finger-goto':
+					fingerGoto();
+					break;
+			}
 		}
 
 	</script>
 </head>
 
 <body>
-	<h1>This is the body</h1>
-	<p><a href="javascript:void(0);" onclick="blinkTest()">Blink Test</a></p>
-	<p><a href="javascript:void(0);" onclick="fingerOpen()">Open Finger</a></p>
-	<p><a href="javascript:void(0);" onclick="fingerClose()">Close Finger</a></p>
-	<p><a href="javascript:void(0);" onclick="fingerGoto()">Go to 10</a></p>
-
-
-
-	<!--<img src="test-image.jpg">-->
+	<h1>Status: <span id="status">Ready</span></h1>
+	<div id="buttons">
+		<div>
+			<!--<a href="javascript:void(0);" onclick="sendInstruction('blink-test');">Blink Test</a>-->
+		</div>
+		<div>
+			<a href="javascript:void(0);" onclick="sendInstruction('finger-open');">Open Finger</a>
+		</div>
+		<div>
+			<a href="javascript:void(0);" onclick="sendInstruction('finger-close');">Close Finger</a>
+		</div>
+		<div>
+			<a href="javascript:void(0);" onclick="sendInstruction('finger-goto');">Go to </a>
+			<input id="gotoAngle" type="text">
+		</div>
+	</div>
 </body>
 
 </html>
