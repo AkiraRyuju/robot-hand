@@ -1,16 +1,17 @@
 class webserver {
+  //Constuctor uses options object passed from index
   constructor(options) {
     const http = require('http');
     const fs = require('fs');
     const path = require('path');
-
+    //Creates server with request: the request sent from the client,  and response: What the server sends back to the client
     http.createServer(function (request, response) {
 
       var filePath = request.url; // The requested page url
       if (filePath == '/') //If the client requests the home page ie Without anything after the main url
         filePath = '/index.html'; // Serves the client with the main page
 
-      var extension = path.extname(filePath);
+      var extension = path.extname(filePath); //Finds the extension name of the file
 
       var contentType = 'text/html';
       switch (extension) {
@@ -41,13 +42,13 @@ class webserver {
 
         fs.readFile(filePath, function (error, content) {
           if (error) {
-            if (error.code == 'ENOENT') {
+            if (error.code == 'ENOENT') { // ENOENT is for if there is no file found (error 404)
               fs.readFile('./404.html', function (error, content) {
                 response.writeHead(200, { 'Content-Type': contentType });
                 response.end(content, 'utf-8');
               });
             } else {
-              response.writeHead(500);
+              response.writeHead(500); //Internal server error
               response.end('Sorry, check with the site admin for error: ' + error.code + ' ..\n');
               response.end();
             }

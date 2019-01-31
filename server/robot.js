@@ -77,29 +77,29 @@ class digit {
   open(callback) {
     // TODO: add speed argument
     try {
-      callback(this.log(`Opening to angle ${this.maxAngle}`));
-      this.servo.to(this.maxAngle);
-      this.currentPosition = this.maxAngle;
+      callback(this.log(`Opening to angle ${this.maxAngle}`)); //TODO test return
+      this.servo.to(this.maxAngle); //Moves the servo to the max angle
+      this.currentPosition = this.maxAngle; // Keeps track of the current position of the 
     } catch (err) {
       callback(this.error(err));
     }
   }
-
+  
   goto(angle, callback) {
-    angle = parseInt(angle);
-
+    angle = parseInt(angle); //If the angle is not an int, it will return 'NaN' ('Not a Number')
+    
     if (isNaN(angle)) {
-
+      
       callback(this.error({ message: `'angle' is not a number!` }));
-
+      
     } else {
-
+      
       if (angle < this.minAngle || angle > this.maxAngle) { //Makes sure that the requested Angle is within bounds
-
+        
         callback(this.error({ message: `Angle ${angle} out of range ${this.minAngle}-${this.maxAngle}` }));
-
+        
       } else {
-
+        
         try {
           callback(this.log(`Going to angle ${angle}`));
           this.servo.to(angle);
@@ -107,13 +107,13 @@ class digit {
         } catch (err) {
           callback(this.error(err));
         }
-
+        
       }
-
+      
     }
-
+    
   }
-
+  
   calibrate(minOffset, maxOffset, callback) {
     // TODO: Add these to a data store
     minOffset = parseInt(minOffset);
@@ -145,9 +145,6 @@ class digit {
     // TODO: return this class' information
   }
 
-  calibrate(minOffset, maxOffset) {
-    // TODO: Add these to a data store
-  }
 }
 
 //Allows the class robot to be able to be used 

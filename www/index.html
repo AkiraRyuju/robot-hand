@@ -9,7 +9,7 @@
 			div#buttons > div a {
 				background-color: lightgray;
 				padding:20px;
-			}
+			} 
 	</style>
 
 	<script>
@@ -17,9 +17,10 @@
 			var xhttp = new XMLHttpRequest();
 			xhttp.onreadystatechange = function () {
 				if (this.readyState == 4 && this.status == 200) {
-					var messageObject = JSON.parse(this.response);
+					var messageObject = JSON.parse(this.response); //converts to JSON
 					updateStatus(messageObject.message);
-				}
+					//passes along just the message component of the JSON request
+				} 
 			};
 			xhttp.open("GET", request_url, true);
 			xhttp.send();
@@ -27,11 +28,28 @@
 
 		function updateStatus(message) {
 			document.getElementById('status').innerHTML = message;
+			//Puts status message onto home page
 		}
 
 		function fingerGoto() {
 			var angle = document.getElementById('gotoAngle').value;
 			ajaxRequest('/api/goto?angle=' + angle);
+		}
+		function fingerCalibrate(){
+			alert('ASS');
+			var minOff = document.getElementById('minOffset').value;
+			var maxOff = document.getElementById('maxOffset').value;
+			if(minOff.length < 3){
+				minOff = `0${minOff}`;
+			}
+			if(maxOff.length < 3){
+				minOff = `0${maxOff}`;
+			}
+			if(minOff.length != 3 || maxOff.length != 3){
+				minOff = '000';
+				maxOff = '000';
+			}
+			ajaxRequest(`/api/calibrate/min${minOff}/max${maxOff}`);
 		}
 
 		function sendInstruction(action) {
@@ -47,6 +65,9 @@
 					break;
 				case 'finger-goto':
 					fingerGoto();
+					break;
+				case 'finger-calibrate':
+					fingerCalibrate();
 					break;
 			}
 		}
@@ -69,6 +90,11 @@
 		<div>
 			<a href="javascript:void(0);" onclick="sendInstruction('finger-goto');">Go to </a>
 			<input id="gotoAngle" type="text">
+		</div>
+		<div>
+			<a href="javascript:void(0);" onclick="sendInstruction('finger-calibrate');">Set Callibrations </a>
+			Minimum <input id="minOffset" type="text">
+			Maximum <input id="maxOffset" type="text">
 		</div>
 	</div>
 </body>
