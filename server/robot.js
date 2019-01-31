@@ -114,6 +114,23 @@ class digit {
 
   }
 
+  calibrate(minOffset, maxOffset, callback) {
+    // TODO: Add these to a data store
+    minOffset = parseInt(minOffset);
+    maxOffset = parseInt(maxOffset);
+    console.log("test");
+    if(isNaN(minOffset) || isNaN(maxOffset)){
+      callback(this.error({message: `One or more of the offsets are invalid`}))
+    }
+    try{
+      this.maxAngle = this.maxAngle + maxOffset;
+      this.minAngle = this.minAngle + minOffset;
+      callback(this.log(`Min and Max angles have been updated`))
+    }catch(err){
+      callback(this.error(err));
+    }
+  }
+
   log(message) {
     console.log(message);
     return { message: message };
