@@ -18,7 +18,7 @@ class robot {
     //Arrow function does magic to 'this' 
     //// Lexical this - The this will not refer to board but will instead refer to constructor/ robot
     board.on("ready", () => {
-      this.isReady = true;
+      this.isReady = true; //flag for if board is ready
       this.finger1.bind();
       callback();
     });
@@ -47,7 +47,7 @@ class digit {
   bind() {
     this.servo = new five.Servo({
       pin: this.pin,
-      deviceRange: [0, 180],
+      deviceRange: [0, 174],
       startAt: this.currentPosition
     });
   }

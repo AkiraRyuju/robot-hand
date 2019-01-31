@@ -6,9 +6,9 @@ class webserver {
 
     http.createServer(function (request, response) {
 
-      var filePath = request.url;
-      if (filePath == '/')
-        filePath = '/index.html';
+      var filePath = request.url; // The requested page url
+      if (filePath == '/') //If the client requests the home page ie Without anything after the main url
+        filePath = '/index.html'; // Serves the client with the main page
 
       var extension = path.extname(filePath);
 
