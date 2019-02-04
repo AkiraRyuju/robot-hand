@@ -43,14 +43,13 @@ class webserver {
         fs.readFile(filePath, function (error, content) {
           if (error) {
             if (error.code == 'ENOENT') { // ENOENT is for if there is no file found (error 404)
-              fs.readFile('./404.html', function (error, content) {
-                response.writeHead(200, { 'Content-Type': contentType });
+              fs.readFile(`${options.documentRoot}/404.html`, function (error, content) {
+                response.writeHead(404, { 'Content-Type': 'text/html' });
                 response.end(content, 'utf-8');
               });
             } else {
               response.writeHead(500); //Internal server error
               response.end('Sorry, check with the site admin for error: ' + error.code + ' ..\n');
-              response.end();
             }
           } else {
             response.writeHead(200, { 'Content-Type': contentType });
@@ -64,5 +63,4 @@ class webserver {
     console.log(`Server started on port ${options.port}`);
   }
 }
-
 module.exports = webserver;

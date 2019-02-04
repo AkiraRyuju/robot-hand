@@ -2,6 +2,7 @@
 
 <head>
 
+
 	<style>
 		div#buttons > div {
 			display: inline-block;
@@ -18,7 +19,7 @@
 			xhttp.onreadystatechange = function () {
 				if (this.readyState == 4 && this.status == 200) {
 					var messageObject = JSON.parse(this.response); //converts to JSON
-					updateStatus(messageObject.message);
+					updateStatus(messageObject.message, messageObject.fingerNumber);
 					//passes along just the message component of the JSON request
 				} 
 			};
@@ -26,48 +27,93 @@
 			xhttp.send();
 		}
 
-		function updateStatus(message) {
-			document.getElementById('status').innerHTML = message;
+		function updateStatus(message, fingerNumber) {
+			switch (fingerNumber){
+				case '1':
+					document.getElementById('statusOne').innerHTML = message;
+					break;
+				case '2':
+					document.getElementById('statusTwo').innerHTML = message;
+					break;
+
+			}
 			//Puts status message onto home page
 		}
 
-		function fingerGoto() {
-			var angle = document.getElementById('gotoAngle').value;
-			ajaxRequest('/api/goto?angle=' + angle);
+		function fingerGoto(fingerNumber) {
+			switch (fingerNumber) {
+				case 1:
+					var angle = document.getElementById('gotoAngleOne').value;
+					break;
+				case 2:
+					var angle = document.getElementById('gotoAngleTwo').value;
+					break;
+			}
+			if (isNaN(angle)){
+				angle = 'errr';
+			}else{
+				angle.toString();
+				while (angle.length < 4){
+					angle = '0' + angle;
+				}
+				if (angle.length > 4){
+					angle = '9999';
+				}
+			}
+			ajaxRequest('/api/goto?angle=' + angle + '/' + fingerNumber);
 		}
-		function fingerCalibrate(){
-			alert('ASS');
-			var minOff = document.getElementById('minOffset').value;
-			var maxOff = document.getElementById('maxOffset').value;
-			if(minOff.length < 3){
-				minOff = `0${minOff}`;
+
+		function fingerCalibrate(fingerNumber){
+			switch(fingerNumber){
+				case 1:
+					var minOff = document.getElementById('minOffsetOne').value;
+					minOff.toString();
+					var maxOff = document.getElementById('maxOffsetOne').value;
+					maxOff.toString();
+					break;
+				case 2: 
+					var minOff = document.getElementById('minOffsetTwo').value;
+					minOff.toString();
+					var maxOff = document.getElementById('maxOffsetTwo').value;
+					maxOff.toString();
+					break;
 			}
-			if(maxOff.length < 3){
-				minOff = `0${maxOff}`;
+
+			while(minOff.length < 3){
+				minOff = '0' + minOff;
 			}
-			if(minOff.length != 3 || maxOff.length != 3){
+			while(maxOff.length < 3){
+				maxOff = '0' + maxOff;
+			}
+			if(minOff.length > 3 || maxOff.length > 3){
 				minOff = '000';
 				maxOff = '000';
 			}
-			ajaxRequest(`/api/calibrate/min${minOff}/max${maxOff}`);
+			ajaxRequest('/api/calibrate/min' + minOff + '/max' + maxOff + '/' + fingerNumber);
 		}
 
-		function sendInstruction(action) {
+		function sendInstruction(action, fingerNumber) {
 			switch (action) {
+				case 'get-position':
+					ajaxRequest('/api/get-pos/' + fingerNumber);
+					break;
 				case 'blink-test':
-					ajaxRequest('/api/blink-test');
+					ajaxRequest('/api/blink-test/' + fingerNumber);
 					break;
 				case 'finger-open':
-					ajaxRequest('/api/open');
+					ajaxRequest('/api/open/' + fingerNumber);
 					break;
 				case 'finger-close':
-					ajaxRequest('/api/close');
+					ajaxRequest('/api/close/' + fingerNumber);
 					break;
 				case 'finger-goto':
-					fingerGoto();
+					fingerGoto(fingerNumber);
 					break;
 				case 'finger-calibrate':
-					fingerCalibrate();
+					fingerCalibrate(fingerNumber);
+					break;
+				case 'get-min-max':
+					ajaxRequest('api/get-min-max/' + fingerNumber);
 					break;
 			}
 		}
@@ -76,25 +122,57 @@
 </head>
 
 <body>
-	<h1>Status: <span id="status">Ready</span></h1>
+	<!--Finger 1-->
+	<h1>Finger 1</h1>
+	<h1>Status: <span id="statusOne">Ready</span></h1>
 	<div id="buttons">
 		<div>
-			<!--<a href="javascript:void(0);" onclick="sendInstruction('blink-test');">Blink Test</a>-->
+			<a href="javascript:void(0);" onclick="sendInstruction('finger-open', 1);">Open Finger</a>
 		</div>
 		<div>
-			<a href="javascript:void(0);" onclick="sendInstruction('finger-open');">Open Finger</a>
+			<a href="javascript:void(0);" onclick="sendInstruction('finger-close', 1);">Close Finger</a>
 		</div>
 		<div>
-			<a href="javascript:void(0);" onclick="sendInstruction('finger-close');">Close Finger</a>
+			<a href="javascript:void(0);" onclick="sendInstruction('finger-goto', 1);">Go to </a>
+			<input id="gotoAngleOne" type="text">
 		</div>
 		<div>
-			<a href="javascript:void(0);" onclick="sendInstruction('finger-goto');">Go to </a>
-			<input id="gotoAngle" type="text">
+			<a href="javascript:void(0);" onclick="sendInstruction('finger-calibrate', 1);">Set Calibrations </a>
+			Minimum <input id="minOffsetOne" type="text">
+			Maximum <input id="maxOffsetOne" type="text">
 		</div>
 		<div>
-			<a href="javascript:void(0);" onclick="sendInstruction('finger-calibrate');">Set Callibrations </a>
-			Minimum <input id="minOffset" type="text">
-			Maximum <input id="maxOffset" type="text">
+			<a href="javascript:void(0);" onclick="sendInstruction('get-position', 1);">Get Position </a>
+		</div>
+		<div>
+			<a href="javascript:void(0);" onclick="sendInstruction('get-min-max', 1);">Get the minimum and maximum angles </a>
+		</div>
+	</div>
+			
+		<!--Finger 2-->
+	<h1>Finger 2</h1>
+	<h1>Status: <span id="statusTwo">Ready</span></h1>
+	<div id="buttons">
+		<div>
+			<a href="javascript:void(0);" onclick="sendInstruction('finger-open', 2);">Open Finger</a>
+		</div>
+		<div>
+			<a href="javascript:void(0);" onclick="sendInstruction('finger-close', 2);">Close Finger</a>
+		</div>
+		<div>
+			<a href="javascript:void(0);" onclick="sendInstruction('finger-goto', 2);">Go to </a>
+			<input id="gotoAngleTwo" type="text">
+		</div>
+		<div>
+			<a href="javascript:void(0);" onclick="sendInstruction('finger-calibrate', 2);">Set Calibrations </a>
+			Minimum <input id="minOffsetTwo" type="text">
+			Maximum <input id="maxOffsetTwo" type="text">
+		</div>
+		<div>
+			<a href="javascript:void(0);" onclick="sendInstruction('get-position', 2);">Get Position </a>
+		</div>
+		<div>
+			<a href="javascript:void(0);" onclick="sendInstruction('get-min-max', 2);">Get the minimum and maximum angles </a>
 		</div>
 	</div>
 </body>
